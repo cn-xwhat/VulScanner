@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>VulScanner</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+</head>
+<body>
+<div id="col-md-12">
+    <div class="col-md-2 navbar-default" style="height: 1000px; width:200px" id="menu">
+        <p class="lead" style="margin-left: 20px; margin-top: 15px; color: #737373"><strong>功能组件</strong></p>
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title unactiveTitle menu-title">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <a href="#task-list" data-toggle="collapse" data-parent="#accordion">查看结果</a>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse" id="task-list">
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/tasklist/"><strong>任务列表</strong></a>
+                    </div>
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/fofalist/"><strong>FOFA采集列表</strong></a>
+                    </div>
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/iplist/"><strong>IP段采集列表</strong></a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title unactiveTitle menu-title">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <a href="#tool-list" data-toggle="collapse" data-parent="#accordion">扫描工具</a>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse" id="tool-list">
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/service/"><strong>服务扫描</strong></a>
+                    </div>
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/vuln/"><strong>漏洞扫描</strong></a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title unactiveTitle menu-title">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <a href="#tool" data-toggle="collapse" data-parent="#accordion">其他工具</a>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse" id="tool">
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/fofa/"><strong>FOFA采集</strong></a>
+                    </div>
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/ip/"><strong>IP段采集</strong></a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title unactiveTitle menu-title">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <a href="#poc" data-toggle="collapse" data-parent="#accordion">管理规则&POC</a>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse" id="poc">
+                    <div class="panel-body subject">
+                        <span class="glyphicon glyphicon-record"></span>
+                        <a href="/scan/poclist/"><strong>POC列表</strong></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10" id="main">
+        <script>
+            var isShow = false
+            var moveLeft = $("#menu").width();
+            var mainWidth = $("#main").width();
+            var containWidth = $("#container").width()
+            {% if not showmenu %}
+                $("#menu").css("marginInlineStart", -(moveLeft + 70))
+                $("#main").css("width", mainWidth + moveLeft + 70)
+                $("#menu").css("display", "none")
+            {% else %}
+                $("#main").css("width", mainWidth)
+                var isShow = true
+            {% endif %}
+        </script>
+        <div class="col-md-12 " style="">
+            <nav class="navbar navbar-static-top navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse" id="example-navbar-collapse">
+                        <ul class="nav navbar-nav col-md-12">
+                            <li><a class="navbar-brand" href="/" style="color: #2b669a"><strong>漏洞扫描工具</strong></a>
+                            </li>
+                            <li id="icon-1"><a href="javascript:void(0)" id="menubtn"><span
+                                    class="glyphicon glyphicon-align-justify"></span></a></li>
+                            <li class="dropdown" id="icon-2"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
+                                    class="glyphicon glyphicon-cog"></span><b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/manage"><span class="glyphicon glyphicon-hourglass"></span>系统管理</a>
+                                    </li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-user"></span>用户信息</a></li>
+                                </ul>
+                            </li>
+                            <li class="pull-right">
+                                <a href="/logout/" class="text-left"><strong><span
+                                        class="glyphicon glyphicon-log-in"></span>
+                                    注销</strong></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="col-md-12 right-message" style="display: none">
+            <div class="alert alert-success alert-dismissible">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <strong class="message"></strong>
+            </div>
+        </div>
+        <div class="col-md-12 wrong-message" style="display: none">
+            <div class="alert alert-danger alert-dismissible">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <strong class="message"></strong>
+            </div>
+        </div>
+        {% block mainbody %}
+        {% endblock %}
+    </div>
+</div>
+<script src="/static/js/main.js"></script>
+<script>
+    $(function () {
+        $("#icon-{{ icon }}").addClass("active")
+        $(".collapse").on('show.bs.collapse', function () {
+            changeTitle($(this))
+        });
+        $(".collapse").on('hide.bs.collapse', function () {
+            changeTitle($(this))
+        });
+        $("#menubtn").click(function () {
+            if (isShow) {
+                $("#menu").animate({marginInlineStart: -(moveLeft + 70)}, "linear")
+                $("#main").animate({width: mainWidth + moveLeft + 70, marginRight: 0}, "linear", function () {
+                    $("#menu").css("display", "none")
+                });
+                isShow = false
+            } else {
+                $("#menu").css("display", "")
+                $("#menu").animate({marginInlineStart: 0}, "linear", function () {
+                })
+                $("#main").animate({width: mainWidth}, "linear");
+                isShow = true
+            }
+        })
+        $(".close").click(function () {
+            $(this).parent().alert("close")
+        })
+    });
+</script>
+</body>
+</html>

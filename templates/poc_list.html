@@ -1,0 +1,277 @@
+{% extends "menu.html" %}
+{% block mainbody %}
+
+    {% load my_tags %}
+    <style>
+        tr th {
+            text-align: center;
+            border: 1px burlywood solid;
+        }
+
+        table {
+            border: 2px inset;
+            border-color: cadetblue;
+        }
+
+        tr {
+            border-bottom: 1px brown solid;
+        }
+
+    </style>
+    <div class="container col-md-10 col-md-offset-1">
+        <div class="panel panel-default text-center">
+            <div class="panel-heading " style="font-size: medium">
+                <span class="col-md-offset-4"><span class="glyphicon glyphicon-list"></span>
+                        POC列表
+                </span>
+                <div class="pull-right col-md-4">
+
+                    <div class="pull-right col-md-3" style="">
+                        <button type="button" class="btn btn-warning" onclick="$('#editModal').modal('show')">添加POC
+                        </button>
+                    </div>
+                    <div class="btn-group drop-down " style="">
+
+                        <button type="button" class="btn btn-default" onclick="location.href='/scan/poclist/'">选择类型
+                        </button>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false"><b class="caret"></b>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for i in type %}
+                                <li><a href="javascript:void(0)" class="poc-list"
+                                       id="{{ forloop.counter }}">{{ i }}</a>
+                                </li>
+                            {% endfor %}
+                            <li class="divider"></li>
+                            <li><a href="javascript:void(0)" class="poc-list" id="-1">其他</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger btn-switch" onclick="switch_all('{{ all_down }}')">
+                            {% if all_down %}
+                                启用所有POC
+                            {% else %}
+                                禁用所有POC
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="table table-hover poc-table">
+                    <tr class="info-tool warning" style="">
+                        <th class="col-md-1">序号</th>
+                        <th class="col-md-3">漏洞名称</th>
+                        <th class="col-md-2">漏洞类型</th>
+                        <th class="col-md-2">漏洞等级</th>
+                        <th class="col-md-2">是否有exp</th>
+                        <th class="col-md-2">是否启用</th>
+                    </tr>
+                    {% for i in poc_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><strong style="color: #a94442">{{ i.real_name }}</strong></td>
+                            <td><strong style="color: chocolate">{{ i.type }}</strong></td>
+                            <td><label class="label label-{{ i.risk }}">{{ risk_dict | get_dict:i.risk }}</label>
+                            </td>
+                            <td>
+                                {% if i.hasExp %}
+                                    <span class="glyphicon glyphicon glyphicon-ok"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon glyphicon-remove"></span>
+                                {% endif %}
+                            </td>
+                            <td class="use-option">
+                                <a href="javascript:void(0)" class="use" id="{{ i.id }}">
+                                    <span class="glyphicon glyphicon-{% if not i.isUse %}remove{% else %}ok{% endif %}"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <div class="text-center foot-block">
+                    <ul class="pagination">
+                        <li><a href="{{ page_url }}{{ page | add:notfirst }}">&laquo;</a></li>
+                        {% for i in pages %}
+                            {% if i != '...' %}
+                                <li class="{% if i == page %}active{% endif %}"><a
+                                        href="{{ page_url }}{{ i }}">{{ i }}</a></li>
+                            {% else %}
+                                <li><span>...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li><a href="{{ page_url }}{{ page | add:notlast }}">&raquo;</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true" style="margin-top: 100px">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                                style="font-size:18px;">
+                            <span style='font-size:18px; margin-top: 4px' class='glyphicon glyphicon-remove'></span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">添加POC</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" id="editForm" action="/scan/poc/add/" method="post">
+                            <div class="row">
+                                <div class="form-inline " style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-2 col-md-offset-3 text-right">
+                                            <label class="control-label" for="name">漏洞名称</label>
+                                        </div>
+                                        <div class="col-md-2 text-left ip_range">
+                                            <input type="text" class="input-sm" id="ips" name="real_name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-inline " style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-3 col-md-offset-2 text-right">
+                                            <label class="control-label" for="description">POC名称</label>
+                                        </div>
+                                        <div class="col-md-2 text-left ip_range">
+                                            <input type="text" class="input-sm" id="desc" name="poc_name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-inline" style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-4 col-md-offset-1 text-right">
+                                            <label class="control-label" for="type">漏洞类型</label>
+                                        </div>
+                                        <div class="col-md-2 text-left">
+                                            <select name="type" id="type" class="form-control">
+                                                {% for i in type %}
+                                                    <option value="{{ forloop.counter0 }}"
+                                                            class="type">{{ i }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-inline" style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-4 col-md-offset-1 text-right">
+                                            <label class="control-label" for="risk">漏洞等级</label>
+                                        </div>
+                                        <div class="col-md-2 text-left">
+                                            <select name="risk" id="risk" class="form-control">
+                                                <option value="0" class="risk">高危
+                                                </option>
+                                                <option value="1" class="risk">中危</option>
+                                                <option value="2" class="risk">低危</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="row port_range service" style="">
+                                    <div class="form-inline" style="margin: 5px">
+                                        <div class="text-center">
+                                            <div class="col-md-4 col-md-offset-1 text-right">
+                                                <label class="control-label" for="exp">是否有exp</label>
+                                            </div>
+                                            <div class="col-md-2 text-left">
+                                                <select name="hasExp" id="exp" class="form-control">
+                                                    <option value="0" onclick="show_exp('none')">否</option>
+                                                    <option value="1" onclick="show_exp('')">是</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row port_range cmd" style="display: none">
+                                    <div class="form-inline" style="margin: 5px">
+                                        <div class="text-center">
+                                            <div class="col-md-4 col-md-offset-1 text-right">
+                                                <label class="control-label" for="admin">exp类型</label>
+                                            </div>
+                                            <div class="col-md-2 text-left">
+                                                <select name="cmd" id="cmd" class="form-control">
+                                                    <option value="0">执行命令</option>
+                                                    <option value="1">上传文件</option>
+                                                    <option value="2">读取文件</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row port_range both" style="display: none">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal-footer" style="margin: 10px; border: none">
+                            <button type="button" class="btn btn-danger" onclick='add_poc()'>确定</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <script>
+        var all_down = "{{ all_down }}"
+
+        function switch_all() {
+            $.get("/json/switch/poc/",
+                data = {
+                    "old": all_down
+                }, function (data) {
+                    data = $.parseJSON(data)
+                    {#alert(data)#}
+                    $(".btn-switch").text(data[0])
+                    $(".use-option").children("a").children("span").removeClass("glyphicon-ok").removeClass("glyphicon-remove")
+                    $(".use-option").children("a").children("span").addClass(data[1])
+                    all_down = data[2]
+                })
+        }
+
+        function show_exp(status) {
+            $(".cmd").css("display", status)
+        }
+
+        $(".poc-list").click(function () {
+                location.href = "/scan/poclist/?type=" + $(this).attr("id")
+            }
+        )
+
+        $(".use").click(function () {
+            var use_span = $(this).children("span")
+            $.get("/json/poc/", {
+                "id": $(this).attr("id")
+            }, function () {
+                use_span.toggleClass("glyphicon-ok").toggleClass("glyphicon-remove")
+            })
+        })
+
+        function add_poc() {
+            $.get("/scan/poc/add/", {
+                "real_name": $("[name='real_name']").val(),
+                "poc_name": $("[name='poc_name']").val(),
+                "type": $("[name='type']").val(),
+                "risk": $("[name='risk']").val(),
+                "hasExp": $("[name='hasExp']").val(),
+                "cmd": $("[name='cmd']").val()
+            }, function () {
+                $("#editModal").modal("hide")
+                location.reload()
+            })
+
+
+        }
+    </script>
+{% endblock %}

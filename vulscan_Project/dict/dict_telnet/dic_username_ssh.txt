@@ -1,0 +1,12 @@
+root
+test
+admin
+user
+guest
+system
+web
+guest
+sys
+linux
+temp
+www

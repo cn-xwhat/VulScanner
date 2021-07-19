@@ -1,0 +1,16 @@
+
+from .. import requestUtil, fileUtil
+from ServiceScanModel.models import ServiceScan
+
+def fingerprint(service):
+    try:
+        return True
+    except:
+        return False
+
+def poc(service: ServiceScan):
+    try:
+        if True:
+            return ["{vuln}"]
+    except:
+        return []

@@ -1,0 +1,123 @@
+{% extends "table.html" %}
+{% block tablebody %}
+
+    <style>
+        .unactive {
+            display: none;
+        }
+    </style>
+    <table class="table table-hover task-table">
+        <tr class="info-tool" style="background-color: #002c55">
+            <th class="col-md-1">序号</th>
+            <th class="col-md-4">地理位置</th>
+            <th class="col-md-2">任务描述</th>
+            <th class="col-md-2">创建日期</th>
+            <th class="col-md-2">结果采集</th>
+            <th class="col-md-1">删除</th>
+        </tr>
+        {% for i in task_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong style="color: crimson">{{ i.ip_range }}</strong></td>
+                <td>
+                    <input class="col-md-10 desc unactive" value="{{ i.description }}" style="height: 22px"
+                           name="description" id="{{ i.id }} "/>
+                    <span class="text-warning">{{ i.description }}</span>
+                    <span class="glyphicon glyphicon-pencil pull-right" style="margin-top: 1px"></span>
+                </td>
+                <td>{{ i.start_time }}</td>
+                <td>
+                    <a href="/scan/{{ mode }}/?id={{ i.id }}">
+                        {% if i.service_process == i.task_count %}
+                            <span class="label label-success">已完成</span>
+                        {% else %}
+                            <span class="label label-warning">未完成</span>
+                        {% endif %}
+                    </a>
+                </td>
+                <td>
+                    <a class="new-btn" href="javascript:void(0)"><span class="glyphicon glyphicon-trash"
+                                                                       onclick='confirm(del, "{{ i.id }}")'
+                                                                       aria-hidden="true"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <script>
+        $(".glyphicon-pencil").click(function () {
+            $(this).siblings("input").toggleClass("unactive")
+            $(this).siblings(".text-warning").toggleClass("unactive")
+        })
+
+        function submit(input) {
+            $.get("/json/edit/", {
+                "id": input.attr("id"),
+                "mode": "task",
+                "description": input.val()
+            })
+            input.toggleClass("unactive")
+            input.siblings(".text-warning").text(input.val())
+            input.siblings(".text-warning").toggleClass("unactive")
+        }
+
+        $(".desc").blur(function () {
+            if (!$(this).hasClass("unactive")) {
+                submit($(this))
+            }
+        })
+
+        $(".desc").keypress(function (event) {  /*绑定回车事件*/
+            if (event.which === 13) {
+                submit($(this))
+            }
+        })
+    </script>
+    {% block modalbody %}
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true" style="margin-top: 100px">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                                style="font-size:18px;">
+                            <span style='font-size:18px; margin-top: 4px' class='glyphicon glyphicon-remove'></span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">新建任务</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" id="editForm" action="/scan/create/" method="post">
+                            <div class="row">
+                                <div class="form-inline " style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-2 col-md-offset-3 text-right">
+                                            <label class="control-label" for="name">地理位置</label>
+                                        </div>
+                                        <div class="col-md-2 text-left ip_range">
+                                            <input type="text" class="input-sm" id="ips" name="ips"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-inline " style="margin: 5px">
+                                    <div class="text-center">
+                                        <div class="col-md-3 col-md-offset-2 text-right">
+                                            <label class="control-label" for="description">任务描述</label>
+                                        </div>
+                                        <div class="col-md-2 text-left ip_range">
+                                            <input type="text" class="input-sm" id="desc" name="description"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal-footer" style="margin: 10px; border: none">
+                            <button type="submit" class="btn btn-danger" onclick='create_task()'>确定</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,77 @@
+
+.panel-title {
+    font-size: 14px;
+}
+
+a {
+    color: #262626;
+}
+
+
+
+.activeTitle {
+    color: #2b669a;
+}
+
+form .row {
+    margin: 10px;
+}
+
+.label {
+    margin-top: 5px;
+    font-size: small;
+}
+
+.glyphicon-record {
+    color: coral;
+    margin-left: 10px;
+}
+
+.glyphicon-eye-close {
+    color: #2b669a;
+}
+
+.unactiveTitle {
+    color: #262626;
+}
+
+.glyphicon {
+    margin-top: 5px;
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+.glyphicon-ok {
+    color: darkgreen;
+}
+
+.glyphicon-remove {
+    color: darkred;
+}
+
+.glyphicon-stop {
+    color: darkred;
+}
+
+.glyphicon-play {
+    color: forestgreen;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+.label-sm {
+    font-size: smaller;
+}
+
+.glyphicon .glyphicon-trash {
+    color: red;
+}
+

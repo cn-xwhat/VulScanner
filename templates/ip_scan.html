@@ -1,0 +1,227 @@
+{% extends "service_scan.html" %}
+{% block panelbody %}
+    <div class="panel-heading" style="font-size: medium">
+        <span class="col-md-offset-4"><span class="glyphicon glyphicon-screenshot"></span> IP段采集</span>
+        <div class="pull-right col-md-4 col-md-push-1">
+            <div class=" dropdown col-md-offset-2 col-md-4">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    查看历史结果 <b class="caret"></b>
+                </button>
+                <ul class="dropdown-menu" style="height: 200px; overflow-y: auto">
+                    {% for i in task_list %}
+                        <li>
+                            <a href="/scan/ip/?id={{ i.id }}">第{{ forloop.counter }}次({{ i.ip_range }}))</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                <button type="button" class="btn btn-default"
+                        onclick="window.location.href='/scan/iplist/'">
+                    返回
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-2 col-md-offset-1"><strong>地理位置</strong></div>
+            <div class="col-md-9">
+                <div class="col-md-8">
+                    <input class="form-control m-auto" name="location" id="ip" value="{{ new_ip }}"/>
+                </div>
+                <div class="input-group-btn drop-down col-md-4" style="">
+
+                    <button type="button" class="btn btn-primary" onclick="test()"
+                            style="margin-left: 50px; border-radius: 5px;">
+                        开始查询
+                    </button>
+                </div>
+            </div>
+        </div>
+        <h5 class="page-header" style="margin: 5px; border-width: 2px"></h5>
+        <div class="table table-hover" style="display:
+                {% if not task.id %}none{% endif %}">
+            <div class="col-md-12 text-info active-ip target-div history-ip" style="margin: 5px">
+                <div class="pull-left">
+                    <span class="glyphicon glyphicon-time"></span>
+                    查询 <span class="target-ip">{{ task.ip_range }}</span> 结果
+                </div>
+                <div class=" pull-right extend">
+                    <button class="btn btn-success btn-sm"
+                            onclick="window.location.href='/scan/export/?mode=ip&id={{ task.id }}'">
+                        导出表格
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-12 text-info unactive-ip target-div scan-ip" style="margin: 5px">
+                <div class="pull-left ">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    正在查询 <span class="target-ip">{{ task.ip_range }}</span> ...
+                </div>
+                <div class=" pull-right">
+                    <div>
+                        <a href="/scan/service/?id={{ task.id }}" class="extend-btn"><span
+                                class=" glyphicon glyphicon-hand-right"></span> 查看服务</a>
+                        <a href="" class="refresh"><span class="glyphicon glyphicon-repeat"></span> 刷新</a>
+                        <a href="javascript:void(0)" class="stop" onclick="stop_process(task_id)"><span
+                                class="glyphicon glyphicon-{% if isPause %}play{% else %}stop{% endif %}"
+                                aria-hidden="true"></span> 停止</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="progress progress-striped ">
+                    <div class="progress-bar " role="progressbar" aria-valuenow="60"
+                         aria-valuemin="0" aria-valuemax="100" style="width: {{ process }}%;">
+                        <span class="sr-only">{{ process }}% 完成</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" style="; overflow-x: unset;overflow-y: auto; height:470px">
+                <table class="table table-hover result-table">
+                    <thead>
+                    <tr style=" background-color: #b8c8be">
+                        <th class="col-md-1">序号</th>
+                        <th class="col-md-4">IP范围</th>
+                        <th class="col-md-5">具体定位</th>
+                        <th class="col-md-2">扫描服务</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-context context">
+                    {% for i in result_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td id="ip_0">{{ i.ip }}</td>
+                            <td id="location" style="color: #2b669a">
+                                {{ i.location }}
+                            </td>
+                            <td><a href="#"><span class="glyphicon glyphicon-share-alt"></span></a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pages|length > 1 %}
+                <div class="text-center foot-block">
+                    <ul class="pagination">
+                        <li><a href="{{ page_url }}{{ page | add:notfirst }}">&laquo;</a></li>
+                        {% for i in pages %}
+                            {% if i != '...' %}
+                                <li class="{% if i == page %}active{% endif %}"><a
+                                        href="{{ page_url }}{{ i }}">{{ i }}</a></li>
+                            {% else %}
+                                <li><span>...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li><a href="{{ page_url }}{{ page | add:notlast }}">&raquo;</a></li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scriptbody %}
+    <script>
+
+        function refresh_process() {
+            $.getJSON("/json/refresh/", {
+                    "count": result_count, "task_id": task_id, "mode": "service",
+                },
+                function (data) {
+                    if (data["process"] === 1) {
+                        animate_ico()
+                        vuln_test()
+                        return true
+                    } else {
+                        setTimeout("refresh_table()", 3000)
+                    }
+                })
+        }
+
+        function refresh_table() {
+            $.getJSON("/json/refresh/", {
+                    "count": result_count, "task_id": task_id, "mode": "{{mode}}",
+                },
+                function (data) {
+                    $(".table-context").append(data["html"])
+                    result_count = data["count"]
+                    reload_process((+data["process"]))
+                    $("[data-toggle='popover']").hover(function () {
+                        $(this).popover('show')
+                    }, function () {
+                        $(this).popover('hide')
+                    })
+                    $("[data-toggle='popover']").on('show.bs.popover', function () {
+                        $("[data-toggle='popover']").not(this).popover("hide")
+                    })
+                    if ($(".progress-bar").width() === $(".progress").width()) {
+                        $(".extend").html("<button class=\"btn btn-success btn-sm\"\n" +
+                            "                                        onclick=\"window.location.href='/scan/export/?mode=ip&id=" + task_id + "'\">\n" +
+                            "                                    导出表格\n" +
+                            "                                </button>")
+                        scan_over()
+                        return true
+                    } else if (isPause) {
+                        return true
+                    } else {
+                        setTimeout("refresh_table()", 1000)
+                    }
+                })
+        }
+
+
+        $(".refresh").hover(
+            function () {
+                $(".glyphicon-repeat").css("animation", "spin 2s linear infinite")
+            },
+            function () {
+                $(".glyphicon-repeat").css("animation", "")
+            }
+        )
+
+        function test() {
+            result_count = 0
+            $(".foot-block").css("display", "none")
+            $.get("/json/id/", function (data) {
+                task_id = (+data)
+                $.get("/scan/start/", {
+                    "location": $("#ip").val(),
+                    "mode": "{{ mode }}",
+                })
+                $(".refresh").attr("href", "/scan/ip/?id=" + task_id)
+                scan()
+                setTimeout("refresh_table()", 1000)
+            })
+        }
+
+
+        $(function () {
+            task_id =
+                {{ task.id }}
+                $("[data-toggle='popover']").on('show.bs.popover', function () {
+                    $("[data-toggle='popover']").not(this).popover("hide")
+                })
+            isPause = {% if isPause %}true{% else %}false{% endif %}
+            result_count =
+                {{ count }}
+                {% if process != 100 %}
+                    animate_ico(isPause)
+                    {% if not isPause %}
+                        refresh_table()
+                    {% endif %}
+                {% else %}
+                {% endif %}
+            {% if new_ip %}
+                test()
+            {% endif %}
+        })
+
+        $(".glyphicon-share-alt").click(function (){
+            var ip = $(this).parent().parent().siblings("#ip_0").text().trim()
+            var location = ($(this).parent().parent().siblings("#location").text().trim().split(" ")[1])
+            window.location.href = ("/scan/service/?new_ip=" + ip + "&port=0&desc=" + location)
+        })
+    </script>
+{% endblock %}

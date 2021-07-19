@@ -1,0 +1,12 @@
+{% extends "menu.html" %}
+{% block mainbody %}
+    <script>
+        $("#main.js").animate({marginInlineStart: -(moveLeft + 70)}, "linear")
+        $("#main").animate({width: mainWidth + moveLeft + 70, marginRight: 0}, "linear", function () {
+            $("#main.js").css("display", "none")
+        });
+        isShow = false
+    </script>
+    {% block scanbody %}
+    {% endblock %}
+{% endblock %}

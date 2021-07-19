@@ -1,0 +1,13 @@
+urllib3==1.26.2
+paramiko==2.7.2
+ws4py==0.5.1
+Django==3.2.1
+pymssql==2.2.1
+redis==3.5.3
+requests==2.25.0
+websockets==8.1
+psycopg2==2.8.6
+PyMySQL==0.9.3
+aiomysql==0.0.21
+IPy==1.01
+pycryptodome==3.10.1

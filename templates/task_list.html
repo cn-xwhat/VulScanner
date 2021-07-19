@@ -1,0 +1,88 @@
+{% extends "table.html" %}
+{% block tablebody %}
+
+    <style>
+        .unactive {
+            display: none;
+        }
+    </style>
+    <table class="table table-hover task-table">
+        <tr class="info-tool" style="background-color: #002c55">
+            <th class="col-md-1">序号</th>
+            {% if mode != 'fofa' %}
+                <th class="col-md-2">扫描范围</th>
+            {% else %}
+                <th class="col-md-2">查询语句</th>
+            {% endif %}
+            <th class="col-md-2">任务描述</th>
+            <th class="col-md-2">创建日期</th>
+            <th class="col-md-2">服务扫描</th>
+            <th class="col-md-2">漏洞扫描</th>
+            <th class="col-md-1">删除</th>
+        </tr>
+        {% for i in task_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong style="color: crimson">{{ i.ip_range }}</strong></td>
+                <td>
+                    <input class="col-md-10 desc unactive" value="{{ i.description }}" style="height: 22px" name="description" id="{{ i.id }} "/>
+                    <span class="text-warning">{{ i.description }}</span>
+                    <span class="glyphicon glyphicon-pencil pull-right" style="margin-top: 1px"></span>
+                </td>
+                <td>{{ i.start_time }}</td>
+                <td>
+                    <a href="/scan/{{ mode }}/?id={{ i.id }}">
+                        {% if i.service_process == i.task_count %}
+                            <span class="label label-success">已完成</span>
+                        {% else %}
+                            <span class="label label-warning">未完成</span>
+                        {% endif %}
+                    </a>
+                </td>
+                <td>
+                    <a href="/scan/vuln/?id={{ i.id }}">
+                        {% if i.vuln_process == i.vuln_count and i.vuln_count != 0 %}
+                            <span class="label label-success">已完成</span>
+                        {% else %}
+                            <span class="label label-warning">未完成</span>
+                        {% endif %}
+                    </a>
+                </td>
+                <td>
+                    <a class="new-btn" href="javascript:void(0)"><span class="glyphicon glyphicon-trash"
+                                                                       onclick='confirm(del, "{{ i.id }}")'
+                                                                       aria-hidden="true"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <script>
+        $(".glyphicon-pencil").click(function () {
+            $(this).siblings("input").toggleClass("unactive")
+            $(this).siblings(".text-warning").toggleClass("unactive")
+        })
+
+        function submit(input) {
+            $.get("/json/edit/", {
+                "id": input.attr("id"),
+                "mode": "task",
+                "description": input.val()
+            })
+            input.toggleClass("unactive")
+            input.siblings(".text-warning").text(input.val())
+            input.siblings(".text-warning").toggleClass("unactive")
+        }
+
+        $(".desc").blur(function () {
+            if (!$(this).hasClass("unactive")) {
+                submit($(this))
+            }
+        })
+
+        $(".desc").keypress(function (event) {  /*绑定回车事件*/
+            if (event.which === 13) {
+                submit($(this))
+            }
+        })
+    </script>
+{% endblock %}

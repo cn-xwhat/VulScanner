@@ -1,0 +1,6 @@
+
+from VulnScanModel.models import VulnScan
+from . import {poc}
+
+def exp(vuln: VulnScan, cmd, content=""):
+    return ""

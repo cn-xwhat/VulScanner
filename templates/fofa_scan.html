@@ -1,0 +1,298 @@
+{% extends "service_scan.html" %}
+{% block panelbody %}
+    <div class="panel-heading" style="font-size: medium">
+        <span class="col-md-offset-4"><span class="glyphicon glyphicon-globe"></span> FOFA结果采集</span>
+        <div class="pull-right col-md-4 col-md-push-1">
+            <div class=" dropdown col-md-offset-2 col-md-4">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    查看历史结果 <b class="caret"></b>
+                </button>
+                <ul class="dropdown-menu" style="height: 200px; overflow-y: auto">
+                    {% for i in task_list %}
+                        <li>
+                            <a href="/scan/fofa/?id={{ i.id }}">第{{ forloop.counter }}次({{ i.ip_range }}))</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                <button type="button" class="btn btn-default"
+                        onclick="window.location.href='/scan/fofalist/'">
+                    返回
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-2 col-md-offset-1"><strong>查询语句</strong></div>
+            <div class="col-md-9">
+                <div class="col-md-8">
+                    <input class="form-control m-auto" name="ip" id="ip" value="{{ new_ip }}"/>
+                    <input type="hidden" name="type" id="port" value="{{ type }}">
+                </div>
+                <div class="input-group-btn drop-down col-md-4" style="">
+
+                    <button type="button" class="btn btn-primary" onclick="test()"
+                            style="margin-left: 50px; border-radius: 5px;">
+                        开始查询
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#grammer">查看查询语法</a>
+                </h4>
+            </div>
+            <div class="panel panel-collapse collapse" id="grammer">
+                <table class="table table-striped">
+                    <tr style="background-color: #f2f3ff">
+                        <th>例句</th>
+                        <th>用途说明</th>
+                        <th>注</th>
+                    </tr>
+                    <tr>
+                        <td>title="beijing"</td>
+                        <td>从标题中搜索“北京”</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>header="elastic"</td>
+                        <td>从http头中搜索“elastic”</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>body="网络空间测绘"</td>
+                        <td>从html正文中搜索“网络空间测绘”</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>domain="qq.com"</td>
+                        <td>搜索根域名带有qq.com的网站。</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>host=".gov.cn"</td>
+                        <td>从url中搜索”.gov.cn”</td>
+                        <td>搜索要用host作为名称</td>
+                    </tr>
+                    <tr>
+                        <td>port="6379"</td>
+                        <td>查找对应“6379”端口的资产</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>ip="1.1.1.1"</td>
+                        <td>从ip中搜索包含“1.1.1.1”的网站</td>
+                        <td>搜索要用ip作为名称</td>
+                    </tr>
+                    <tr>
+                        <td>country="CN"</td>
+                        <td>搜索指定国家(编码)的资产。</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>region="Xinjiang"</td>
+                        <td>搜索指定行政区的资产。</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>city="Ürümqi"</td>
+                        <td>搜索指定城市的资产。</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>app="Microsoft-Exchange"</td>
+                        <td>搜索Microsoft-Exchange设备</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>org="China Education and Research Network Center"</td>
+                        <td>搜索中国高校教育机构设备</td>
+                        <td>-</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <h5 class="page-header" style="margin: 5px; border-width: 2px"></h5>
+        <div class="table table-hover" style="display:
+                {% if not task.id %}none{% endif %}">
+            <div class="col-md-12 text-info active-ip target-div history-ip" style="margin: 5px">
+                <div class="pull-left">
+                    <span class="glyphicon glyphicon-time"></span>
+                    查询 <span class="target-ip">{{ task.ip_range }}</span> 结果
+                </div>
+                <div class=" pull-right extend">
+                    <button class="btn btn-warning btn-sm"
+                            onclick="clear_note({{ task.id }})">
+                        清空备注
+                    </button>
+                    <button class="btn btn-primary btn-sm"
+                            onclick="window.location.href='/scan/vuln/?id={{ task.id }}'">
+                        {% if not task.isStart %}扫描漏洞{% else %}查看漏洞{% endif %}</button>
+                    <button class="btn btn-success btn-sm"
+                            onclick="window.location.href='/scan/export/?mode=service&id={{ task.id }}'">
+                        导出表格
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-12 text-info unactive-ip target-div scan-ip" style="margin: 5px">
+                <div class="pull-left ">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    正在查询 <span class="target-ip">{{ task.ip_range }}</span> ...
+                </div>
+                <div class="pull-right">
+                    <div>
+                        <a href="/scan/vuln/?id={{ task.id }}" class="extend-btn"><span
+                                class=" glyphicon glyphicon-hand-right"></span> 查看漏洞</a>
+                        <a href="" class="refresh"><span class="glyphicon glyphicon-repeat"></span> 刷新</a>
+                        <a href="javascript:void(0)" class="stop" onclick="stop_process(task_id)"><span
+                                class="glyphicon glyphicon-{% if isPause %}play{% else %}stop{% endif %}"
+                                aria-hidden="true"></span> 停止</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="progress progress-striped ">
+                    <div class="progress-bar " role="progressbar" aria-valuenow="60"
+                         aria-valuemin="0" aria-valuemax="100" style="width: {{ process }}%;">
+                        <span class="sr-only">{{ process }}% 完成</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" style="overflow: auto; height:450px;">
+                <table class="table table-hover result-table">
+                    <thead>
+                    <tr style=" background-color: #b8c8be">
+                        <th class="col-md-1">序号</th>
+                        <th class="col-md-2">IP</th>
+                        <th class="col-md-3">端口</th>
+                        <th class="col-md-3">服务</th>
+                        <th class="col-md-2">备注</th>
+                        <th class="col-md-1">状态</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-context" class="context">
+                    {% for i in result_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ i.ip }}</td>
+                            <td>{% for p in i.ports %}
+                                {% if p.type == "high" %}
+                                    <label class="label label-danger">{{ p.label }}</label>
+                                {% elif p.type == "medium" %}
+                                    <label class="label label-primary">{{ p.label }}</label>
+                                {% else %}
+                                    <label class="label label-success">{{ p.label }}</label>
+                                {% endif %}
+                            {% endfor %}
+                            </td>
+                            <td>
+                                {% for p in i.ports %}
+                                    {% if p.title %}
+                                        <label class="label label-default" data-toggle="popover"
+                                               data-placement="auto right"
+                                               data-title="Title: {{ p.title }}"
+                                               data-content="Port: {{ p.port }}<br>Server: {{ p.server }}"
+                                               data-html="true"><a href="javascript:void(0)"
+                                                                   onclick="window.open('{{ p.url }}')"><span
+                                                class="port">{{ p.port }}:</span> {{ p.title | truncatechars:10 }}
+                                        </a></label>
+                                    {% endif %}
+                                {% endfor %}
+                            <td style="color: crimson" class="text-center note">
+                                <input class="unactive new-note" value="{{ i.note }}" id="{{ i.ip }}"
+                                       style="height: 22px" name="note"/>
+                                <span class="note">{{ i.note }}</span>
+                            </td>
+                            <td><a href="#"><span id="{{ i.ip }}"
+                                                  class="glyphicon service
+                                                              {% if not i.vulnerable %}
+                                                              glyphicon-eye-close
+{% else %}
+glyphicon-eye-open
+{% endif %}">
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pages|length > 1 %}
+                <div class="text-center foot-block">
+                    <ul class="pagination">
+                        <li><a href="{{ page_url }}{{ page | add:notfirst }}">&laquo;</a></li>
+                        {% for i in pages %}
+                            {% if i != '...' %}
+                                <li class="{% if i == page %}active{% endif %}"><a
+                                        href="{{ page_url }}{{ i }}">{{ i }}</a></li>
+                            {% else %}
+                                <li><span>...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li><a href="{{ page_url }}{{ page | add:notlast }}">&raquo;</a></li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scriptbody %}
+    <script>
+        function reload_process(width, speed = "slow") {
+            var n_width = $(".progress").width() * width
+            $(".progress-bar").animate({"width": n_width})
+        }
+
+
+        function test() {
+            result_count = 0
+            $.get("/json/id/", function (data) {
+                task_id = (+data)
+                $.get("/scan/start/", {
+                    "ips": $("#ip").val(),
+                    "mode": "{{ mode }}",
+                    "description": "{{ description }}"
+                })
+                $(".extend-btn").attr("href", "/scan/vuln/?id=" + task_id)
+                $(".foot-block").html("")
+                $(".refresh").attr("href", "/scan/fofa/?id=" + task_id)
+                scan()
+                setTimeout("refresh_table()", 3000)
+            })
+        }
+
+        $(".refresh").hover(
+            function () {
+                $(".glyphicon-repeat").css("animation", "spin 2s linear infinite")
+            },
+            function () {
+                $(".glyphicon-repeat").css("animation", "")
+            }
+        )
+
+        $(function () {
+            task_id =
+                {{ task.id }}
+                $("[data-toggle='popover']").on('show.bs.popover', function () {
+                    $("[data-toggle='popover']").not(this).popover("hide")
+                })
+            isPause = {% if isPause %}true{% else %}false{% endif %}
+            result_count =
+                {{ count }}
+                {% if process != 100 %}
+                    animate_ico(isPause)
+                    {% if not isPause %}
+                        refresh_table()
+                    {% endif %}
+                {% else %}
+                {% endif %}
+            {% if new_ip %}
+                test()
+            {% endif %}
+        })
+
+    </script>
+{% endblock %}
