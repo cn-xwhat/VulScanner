@@ -26,7 +26,6 @@ INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasEx
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (33, 'ssh_burp', 'ssh弱密码', '弱密码', 'danger', 1, 0, '执行命令');
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (34, 'apache_solr_velocity', 'Apache Solr Velocity模板远程执行', '命令执行', 'danger', 1, 0, '执行命令');
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (35, 'landary_file', '蓝凌OA 任意文件读取', '任意文件读取', 'danger', 1, 0, '读取文件');
-INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (36, 'daloradius_pwd', 'daloradius弱密码', '弱密码', 'danger', 1, 0, '上传文件');
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (37, 'wui_xml', '泛微OA_XML反序列化', '命令执行', 'danger', 0, 0, '');
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (38, 'nete_firewall', '奇安信 网康下一代防火墙RCE', '命令执行', 'danger', 1, 0, '执行命令');
 INSERT INTO `pocmodel_poc`(`id`, `poc_name`, `real_name`, `type`, `risk`, `hasExp`, `isUse`, `cmd`) VALUES (39, 'vesystem_rce', '和信创天云桌面_RCE', '任意文件上传', 'danger', 1, 0, '上传文件');
